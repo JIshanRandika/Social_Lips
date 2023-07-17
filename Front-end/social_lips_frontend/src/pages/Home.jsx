@@ -3,16 +3,57 @@ import Login from "./Login";
 import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import FileUpload from "../components/FileUpload";
+import axios from "axios";
 
 const imgURL =
   "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
 
 function Home(props) {
-  const [file, setFile] = useState("");
+  const [files, setFile] = useState("");
 
   function handleFile(e) {
     setFile(e.target.files[0]);
   }
+
+  const uploadHandler = () => {
+    axios({
+      method: "POST",
+      url: "http://localhost:8800/upload",
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      data: {
+        file: files,
+      },
+    })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+
+    // axios
+    //   .post("http://localhost:8800/upload", {
+    //     file: files,
+    //   })
+    //   .then(function (response) {
+    //     console.log(response);
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+
+    // axios
+    //   .get("http://localhost:8800/list")
+    //   .then(function (response) {
+    //     // handle success
+    //     console.log(response);
+    //   })
+    //   .catch(function (error) {
+    //     // handle error
+    //     console.log(error);
+    //   })
+    //   .finally(function () {
+    //     // always executed
+    //   });
+  };
   return (
     <div className="bg-slate-800 mx-auto max-w-xl flex flex-col mt-5 p-3 rounded-md gap-3">
       <div className="flex justify-between gap-3">
@@ -39,7 +80,8 @@ function Home(props) {
         </div>
         <button
           className="w-1/2 self-center bg-blue-800 rounded-md text-lg font-semibold text-white p-2 disabled:opacity-30 disabled:cursor-not-allowed"
-          disabled={file === ""}
+          disabled={files === ""}
+          onClick={uploadHandler}
         >
           Upload
         </button>
