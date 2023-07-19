@@ -9,24 +9,36 @@ const imgURL =
   "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
 
 function Home(props) {
-  const [files, setFile] = useState("");
+  const [files, setFile] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   function handleFile(e) {
     setFile(e.target.files[0]);
   }
 
   const uploadHandler = () => {
+    if (!files) return;
+    setIsLoading(true);
+    const frmData = new FormData();
+    frmData.append("file", files);
     axios({
       method: "POST",
       url: "http://localhost:8800/upload",
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      data: {
-        file: files,
+      data: frmData,
+      onUploadProgress: (data) => {
+        console.log(Math.round((100 * data.loaded) / data.total));
       },
     })
-      .then((res) => console.log(res))
+      .then((res) => {
+        console.log(res);
+        // setIsLoading(false);
+        // setProgress((res.data.loaded / res.data.total) * 100);
+        // console.log((res.data.loaded / res.data.total) * 100);
+      })
       .catch((err) => console.log(err));
 
     // axios
@@ -54,6 +66,7 @@ function Home(props) {
     //     // always executed
     //   });
   };
+
   return (
     <div className="bg-slate-800 mx-auto max-w-xl flex flex-col mt-5 p-3 rounded-md gap-3">
       <div className="flex justify-between gap-3">
@@ -86,6 +99,7 @@ function Home(props) {
           Upload
         </button>
       </div>
+      {isLoading ? <h1>Loading</h1> : <h1>Ok..</h1>}
     </div>
   );
 }

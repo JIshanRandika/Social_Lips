@@ -69,22 +69,34 @@ aws.config.update({
 const BUCKET = process.env.BUCKET;
 const s3 = new aws.S3();
 
-const upload = multer({
-  storage: multerS3({
-    bucket: BUCKET,
-    s3: s3,
-    acl: "public-read",
-    key: (req, file, cb) => {
-      cb(null, file.originalname);
-    },
-  }),
-});
+// const upload = multer({
+//   storage: multerS3({
+//     bucket: BUCKET,
+//     s3: s3,
+//     acl: "public-read",
+//     key: (req, file, cb) => {
+//       cb(null, file.originalname);
+//     },
+//   }),
+// });
 
-app.post("/upload", upload.single("file"), (req, res) => {
-  console.log(req.file);
+//controllers
+const { uploadFileController } = require("./controllers");
 
-  res.send("SuccessFully uploaded " + req.file.location + "location");
-});
+// Set up Multer middleware to handle file uploads
+// by default, multer will store files in memory
+const upload = multer();
+
+// Handle the file upload
+app.post("/upload", upload.single("file"), uploadFileController);
+
+//------------------------------------------------------------
+
+// app.post("/upload", upload.single("file"), (req, res) => {
+//   console.log(req.file);
+
+//   res.send("SuccessFully uploaded " + req.file.location + "location");
+// });
 
 app.get("/list", async (req, res) => {
   let r = await s3.listObjectsV2({ Bucket: BUCKET }).promise();
